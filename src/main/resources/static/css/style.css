@@ -1,0 +1,288 @@
+/* ============================================
+   校园活动报名与场地调度系统 - 全局样式
+   ============================================ */
+
+:root {
+    --primary: #1a73e8;
+    --primary-dark: #1557b0;
+    --success: #0f9d58;
+    --warning: #f4b400;
+    --danger: #db4437;
+    --bg-light: #f8f9fa;
+    --sidebar-width: 240px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-light);
+    min-height: 100vh;
+}
+
+/* ── 登录页 ── */
+.login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+}
+.login-card {
+    width: 420px;
+    padding: 2.5rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+    font-weight: 700;
+}
+.login-card .subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+/* ── 管理布局 ── */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+.sidebar {
+    width: var(--sidebar-width);
+    background: #1e293b;
+    color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+.sidebar-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.sidebar-header small {
+    color: #94a3b8;
+}
+.sidebar-nav {
+    flex: 1;
+    padding: 1rem 0;
+}
+.sidebar-nav .nav-link {
+    color: #cbd5e1;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+}
+.sidebar-nav .nav-link:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+.sidebar-nav .nav-link.active {
+    background: rgba(26,115,232,0.2);
+    color: #fff;
+    border-left-color: var(--primary);
+}
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 1.5rem;
+}
+
+/* ── 卡片 ── */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    margin-bottom: 1rem;
+}
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 10px;
+    color: #fff;
+}
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+}
+.stat-card .stat-label {
+    opacity: 0.85;
+    font-size: 0.9rem;
+}
+
+/* ── 状态标签 ── */
+.badge-pending  { background: var(--warning); color: #000; }
+.badge-approved { background: var(--success); }
+.badge-rejected { background: var(--danger); }
+.badge-available { background: var(--success); }
+.badge-unavailable { background: #666; }
+
+/* ── 表单 ── */
+.form-label { font-weight: 500; font-size: 0.9rem; }
+
+/* ── 表格 ── */
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.table td { vertical-align: middle; }
+.fixed-table-wrap {
+    max-height: 540px;
+    overflow: auto;
+    min-height: 200px;
+}
+.fixed-table-wrap table {
+    min-width: 100%;
+    table-layout: fixed;
+}
+.fixed-table-wrap thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.fixed-table-wrap thead th {
+    background: #f8f9fa;
+}
+
+/* ── 日程时间轴 ── */
+.schedule-day {
+    margin-bottom: 2rem;
+}
+.schedule-venue {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid var(--primary);
+}
+.schedule-venue h6 {
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+.schedule-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 0;
+    background: var(--bg-light);
+    border-radius: 6px;
+}
+.schedule-time {
+    min-width: 100px;
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+.schedule-info {
+    flex: 1;
+}
+
+/* ── 响应式 ── */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+    .sidebar .nav-link span,
+    .sidebar-header h4,
+    .sidebar-header small,
+    .sidebar-footer span {
+        display: none;
+    }
+    .main-content {
+        margin-left: 60px;
+    }
+    .login-card {
+        width: 90%;
+    }
+}
+
+/* ── 工具类 ── */
+.content-section { display: none; }
+.content-section.active { display: block; }
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #94a3b8;
+}
+.empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+/* ── 搜索栏 ── */
+.search-bar {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* ── 分页 ── */
+.pagination-wrapper {
+    margin-top: 1rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid #e9ecef;
+}
+.pagination .page-link {
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 0 2px;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    font-weight: 500;
+    min-width: 38px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+.pagination .page-link:hover {
+    background: #e9ecef;
+    border-color: #ced4da;
+    color: #212529;
+}
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #1a73e8, #1557b0);
+    border-color: #1a73e8;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(26,115,232,0.3);
+    font-weight: 600;
+}
+.pagination .page-item.disabled .page-link {
+    color: #adb5bd;
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+}
+
+/* ── 模态框修正 ── */
+.modal-header {
+    background: var(--primary);
+    color: #fff;
+}
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}

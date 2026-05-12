@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员 - 校园活动报名与场地调度系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+    <nav class="sidebar">
+        <div class="sidebar-header"><h4><i class="bi bi-building"></i> 管理后台</h4><small id="adminName">管理员</small></div>
+        <div class="sidebar-nav">
+            <a class="nav-link active" data-section="dashboard" onclick="showSection('dashboard')"><i class="bi bi-speedometer2"></i><span>仪表盘</span></a>
+            <a class="nav-link" data-section="venue" onclick="showSection('venue')"><i class="bi bi-geo-alt"></i><span>场地管理</span></a>
+            <a class="nav-link" data-section="activity" onclick="showSection('activity')"><i class="bi bi-calendar-check"></i><span>活动管理</span></a>
+            <a class="nav-link" data-section="schedule" onclick="showSection('schedule')"><i class="bi bi-calendar-week"></i><span>活动日程</span></a>
+        </div>
+        <div class="sidebar-footer"><button class="btn btn-outline-light btn-sm w-100" onclick="logout()"><i class="bi bi-box-arrow-right"></i><span>退出登录</span></button></div>
+    </nav>
+
+    <div class="main-content">
+        <!-- 仪表盘 -->
+        <section id="section-dashboard" class="content-section active">
+            <h4 class="mb-4"><i class="bi bi-speedometer2"></i> 系统概览</h4>
+            <div class="row" id="statsRow">
+                <div class="col-md-3 mb-3"><div class="stat-card bg-primary"><div class="stat-number" id="statVenue">0</div><div class="stat-label">场地总数</div></div></div>
+                <div class="col-md-3 mb-3"><div class="stat-card bg-success"><div class="stat-number" id="statActivity">0</div><div class="stat-label">活动总数</div></div></div>
+                <div class="col-md-3 mb-3"><div class="stat-card bg-warning"><div class="stat-number" id="statPending">0</div><div class="stat-label">待审核活动</div></div></div>
+                <div class="col-md-3 mb-3"><div class="stat-card bg-info"><div class="stat-number" id="statPerson">0</div><div class="stat-label">注册用户</div></div></div>
+            </div>
+            <div class="card"><div class="card-header"><strong><i class="bi bi-exclamation-triangle"></i> 待审核活动</strong></div><div class="card-body" id="pendingList"></div></div>
+        </section>
+
+        <!-- 场地管理 -->
+        <section id="section-venue" class="content-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0"><i class="bi bi-geo-alt"></i> 场地管理</h4>
+                <button class="btn btn-primary" onclick="openVenueModal()"><i class="bi bi-plus-lg"></i> 新增场地</button>
+            </div>
+            <div class="card"><div class="card-body">
+                <div class="fixed-table-wrap"><table class="table table-hover"><thead class="table-light"><tr><th>编号</th><th>场地名称</th><th>地点</th><th>容量</th><th>开放时间</th><th>状态</th><th>操作</th></tr></thead><tbody id="venueTableBody"></tbody></table></div>
+                <div id="venuePagination"></div>
+            </div></div>
+        </section>
+
+        <!-- 活动管理 -->
+        <section id="section-activity" class="content-section">
+            <h4 class="mb-3"><i class="bi bi-calendar-check"></i> 活动管理</h4>
+            <div class="search-bar row g-2 align-items-end">
+                <div class="col-md-3"><label class="form-label">活动名称</label><input type="text" class="form-control" id="searchName" placeholder="模糊搜索"></div>
+                <div class="col-md-2"><label class="form-label">活动类型</label><select class="form-select" id="searchType"><option value="">全部</option><option>学术讲座</option><option>文体活动</option><option>志愿服务</option><option>其他</option></select></div>
+                <div class="col-md-2"><label class="form-label">日期</label><input type="date" class="form-control" id="searchDate"></div>
+                <div class="col-md-2"><label class="form-label">状态</label><select class="form-select" id="searchStatus"><option value="">全部</option><option>待审核</option><option>已通过</option><option>已拒绝</option></select></div>
+                <div class="col-md-3"><button class="btn btn-primary me-2" onclick="loadActivities(1)"><i class="bi bi-search"></i> 查询</button><button class="btn btn-outline-success" onclick="openActivityAddModal()"><i class="bi bi-plus-lg"></i> 发布活动</button></div>
+            </div>
+            <div class="card"><div class="card-body">
+                <div class="fixed-table-wrap"><table class="table table-hover"><thead class="table-light"><tr><th>编号</th><th>活动名称</th><th>类型</th><th>发起单位</th><th>日期</th><th>场地</th><th>报名</th><th>状态</th><th>操作</th></tr></thead><tbody id="activityTableBody"></tbody></table></div>
+                <div id="activityPagination"></div>
+            </div></div>
+        </section>
+
+        <!-- 活动日程 -->
+        <section id="section-schedule" class="content-section">
+            <h4 class="mb-3"><i class="bi bi-calendar-week"></i> 活动日程</h4>
+            <div class="search-bar row g-2 align-items-end">
+                <div class="col-md-3"><label class="form-label">选择日期</label><input type="date" class="form-control" id="scheduleDate" onchange="loadSchedule()"></div>
+                <div class="col-md-3"><button class="btn btn-outline-secondary" onclick="document.getElementById('scheduleDate').value='';loadSchedule();"><i class="bi bi-arrow-repeat"></i> 显示全部</button></div>
+            </div>
+            <div id="scheduleContent"></div>
+        </section>
+    </div>
+</div>
+
+<!-- 场地模态框 -->
+<div class="modal fade" id="venueModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="venueModalTitle">新增场地</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <input type="hidden" id="venueId">
+        <div class="mb-3"><label class="form-label">场地名称 <span class="text-danger">*</span></label><input type="text" class="form-control" id="venueName" required></div>
+        <div class="mb-3"><label class="form-label">地点</label><input type="text" class="form-control" id="venueLocation"></div>
+        <div class="row"><div class="col-md-6 mb-3"><label class="form-label">容量(人数)</label><input type="number" class="form-control" id="venueCapacity" min="1" value="100"></div><div class="col-md-6 mb-3"><label class="form-label">开放时间</label><input type="text" class="form-control" id="venueOpenTime" placeholder="如: 08:00-22:00"></div></div>
+        <div class="mb-3"><label class="form-label">使用状态</label><select class="form-select" id="venueStatus"><option value="1">可用</option><option value="0">不可用</option></select></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button><button type="button" class="btn btn-primary" onclick="saveVenue()">保存</button></div>
+</div></div></div>
+
+<!-- 活动模态框 -->
+<div class="modal fade" id="activityModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="activityModalTitle">发布活动</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <input type="hidden" id="activityId">
+        <div class="row"><div class="col-md-8 mb-3"><label class="form-label">活动名称 <span class="text-danger">*</span></label><input type="text" class="form-control" id="activityName" required></div><div class="col-md-4 mb-3"><label class="form-label">活动类型 <span class="text-danger">*</span></label><select class="form-select" id="activityType"><option>学术讲座</option><option>文体活动</option><option>志愿服务</option><option>其他</option></select></div></div>
+        <div class="row"><div class="col-md-6 mb-3"><label class="form-label">发起单位</label><input type="text" class="form-control" id="activityOrganizer" placeholder="社团/学院名称"></div><div class="col-md-6 mb-3"><label class="form-label">活动场地</label><select class="form-select" id="activityVenueId"><option value="">-- 请选择场地 --</option></select></div></div>
+        <div class="row"><div class="col-md-4 mb-3"><label class="form-label">活动日期 <span class="text-danger">*</span></label><input type="date" class="form-control" id="activityDate" required></div><div class="col-md-4 mb-3"><label class="form-label">开始时间</label><input type="time" class="form-control" id="activityStartTime"></div><div class="col-md-4 mb-3"><label class="form-label">结束时间</label><input type="time" class="form-control" id="activityEndTime"></div></div>
+        <div class="mb-3"><label class="form-label">最大参与人数</label><input type="number" class="form-control" id="activityMaxParticipants" min="0" value="100"></div>
+        <div class="mb-3"><label class="form-label">活动描述</label><textarea class="form-control" id="activityDescription" rows="3"></textarea></div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button><button type="button" class="btn btn-primary" onclick="saveActivity()">保存</button></div>
+</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../js/common.js"></script>
+<script>
+let currentUser=null,venueModal,activityModal;
+let venuePage=1,activityPage=1;
+
+window.addEventListener('DOMContentLoaded',async()=>{
+    currentUser=await checkLogin();
+    if(!currentUser||currentUser.role!=='admin'){window.location.href='../login.html';return;}
+    document.getElementById('adminName').textContent=currentUser.name;
+    venueModal=new bootstrap.Modal(document.getElementById('venueModal'));
+    activityModal=new bootstrap.Modal(document.getElementById('activityModal'));
+    await Promise.all([loadStats(),loadVenues(1),loadActivities(1),loadSchedule()]);
+});
+
+function showSection(name){
+    document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav .nav-link').forEach(l=>l.classList.remove('active'));
+    document.getElementById('section-'+name).classList.add('active');
+    document.querySelector(`[data-section="${name}"]`).classList.add('active');
+    if(name==='schedule')loadSchedule();
+}
+
+// ===== 仪表盘 =====
+async function loadStats(){
+    const[venueRes,actRes]=await Promise.all([api.get(API_BASE+'/venue/list'),api.get(API_BASE+'/activity/list')]);
+    if(venueRes.code===200)document.getElementById('statVenue').textContent=venueRes.data.length;
+    if(actRes.code===200){
+        const acts=actRes.data;
+        document.getElementById('statActivity').textContent=acts.length;
+        document.getElementById('statPending').textContent=acts.filter(a=>a.status==='待审核').length;
+        const pending=acts.filter(a=>a.status==='待审核');
+        const c=document.getElementById('pendingList');
+        if(!pending.length){c.innerHTML='<div class="empty-state"><div class="icon">&#x2705;</div><p>暂无待审核活动</p></div>';}
+        else{c.innerHTML=pending.map(a=>`<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div><strong>${escapeHtml(a.name)}</strong><small class="text-muted ms-2">${a.type||''} | ${a.organizer||''} | ${a.activityDate||''}</small></div><div><button class="btn btn-sm btn-success me-1" onclick="reviewActivity(${a.activityId},'已通过')">通过</button><button class="btn btn-sm btn-danger" onclick="reviewActivity(${a.activityId},'已拒绝')">拒绝</button></div></div>`).join('');}
+    }
+}
+
+// ===== 场地管理(分页) =====
+async function loadVenues(pg){
+    if(pg)venuePage=pg;
+    const data=await api.get(API_BASE+'/venue/page?page='+venuePage+'&pageSize=8');
+    const tbody=document.getElementById('venueTableBody');
+    if(data.code!==200||!data.data.records.length){tbody.innerHTML='<tr><td colspan="7" class="text-center text-muted py-4">暂无场地数据</td></tr>';document.getElementById('venuePagination').innerHTML='';return;}
+    const pr=data.data;
+    // 更新活动模态框场地下拉
+    const allVenues=await api.get(API_BASE+'/venue/list');
+    if(allVenues.code===200){const sel=document.getElementById('activityVenueId');sel.innerHTML='<option value="">-- 请选择场地 --</option>'+allVenues.data.map(v=>`<option value="${v.venueId}">${escapeHtml(v.name)} (容量:${v.capacity})</option>`).join('');}
+    tbody.innerHTML=pr.records.map((v,i)=>`<tr><td>${(pr.page-1)*pr.pageSize+i+1}</td><td><strong>${escapeHtml(v.name)}</strong></td><td>${escapeHtml(v.location||'')}</td><td>${v.capacity}</td><td>${escapeHtml(v.openTime||'')}</td><td>${v.status===1?'<span class="badge badge-available">可用</span>':'<span class="badge badge-unavailable">不可用</span>'}</td><td><button class="btn btn-sm btn-outline-primary me-1" onclick="editVenue(${v.venueId})"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteVenue(${v.venueId},'${escapeHtml(v.name)}')"><i class="bi bi-trash"></i></button></td></tr>`).join('');
+    document.getElementById('venuePagination').innerHTML=renderPagination(pr.total,pr.page,pr.pageSize,loadVenues);
+}
+
+function openVenueModal(){document.getElementById('venueModalTitle').textContent='新增场地';document.getElementById('venueId').value='';document.getElementById('venueName').value='';document.getElementById('venueLocation').value='';document.getElementById('venueCapacity').value='100';document.getElementById('venueOpenTime').value='';document.getElementById('venueStatus').value='1';venueModal.show();}
+async function editVenue(id){const data=await api.get(API_BASE+'/venue/'+id);if(data.code!==200)return;const v=data.data;document.getElementById('venueModalTitle').textContent='编辑场地';document.getElementById('venueId').value=v.venueId;document.getElementById('venueName').value=v.name;document.getElementById('venueLocation').value=v.location||'';document.getElementById('venueCapacity').value=v.capacity;document.getElementById('venueOpenTime').value=v.openTime||'';document.getElementById('venueStatus').value=v.status;venueModal.show();}
+async function saveVenue(){const venue={venueId:document.getElementById('venueId').value||null,name:document.getElementById('venueName').value.trim(),location:document.getElementById('venueLocation').value.trim(),capacity:parseInt(document.getElementById('venueCapacity').value)||0,openTime:document.getElementById('venueOpenTime').value.trim(),status:parseInt(document.getElementById('venueStatus').value)};if(!venue.name){showToast('场地名称不能为空','error');return;}const id=venue.venueId;let d;if(id){venue.venueId=parseInt(id);d=await api.put(API_BASE+'/venue/update',venue);}else{delete venue.venueId;d=await api.post(API_BASE+'/venue/add',venue);}if(d.code===200){venueModal.hide();showToast(d.message);await loadVenues(venuePage);}else{showToast(d.message,'error');}}
+async function deleteVenue(id,name){if(!confirm('确定删除场地"'+name+'"吗？此操作不可恢复。'))return;const d=await api.del(API_BASE+'/venue/'+id);if(d.code===200){showToast('删除成功');await loadVenues(venuePage);}else{showToast(d.message,'error');}}
+
+// ===== 活动管理(分页) =====
+async function loadActivities(pg){
+    if(pg)activityPage=pg;
+    const p=new URLSearchParams();p.append('page',activityPage);p.append('pageSize','10');
+    const name=document.getElementById('searchName').value.trim(),type=document.getElementById('searchType').value,date=document.getElementById('searchDate').value,status=document.getElementById('searchStatus').value;
+    if(name)p.append('name',name);if(type)p.append('type',type);if(date)p.append('date',date);if(status)p.append('status',status);
+    const data=await api.get(API_BASE+'/activity/page?'+p.toString());
+    const tbody=document.getElementById('activityTableBody');
+    if(data.code!==200||!data.data.records.length){tbody.innerHTML='<tr><td colspan="9" class="text-center text-muted py-4">暂无活动数据</td></tr>';document.getElementById('activityPagination').innerHTML='';return;}
+    const pr=data.data;
+    tbody.innerHTML=pr.records.map((a,i)=>`<tr><td>${(pr.page-1)*pr.pageSize+i+1}</td><td><strong>${escapeHtml(a.name)}</strong></td><td>${escapeHtml(a.type||'')}</td><td>${escapeHtml(a.organizer||'')}</td><td>${a.activityDate||''}</td><td>${escapeHtml(a.venueName||'未分配')}</td><td>${a.currentParticipants||0}/${a.maxParticipants||0}</td><td>${statusBadge(a.status)}</td><td>${a.status==='待审核'?`<button class="btn btn-sm btn-success me-1" onclick="reviewActivity(${a.activityId},'已通过')">通过</button><button class="btn btn-sm btn-danger me-1" onclick="reviewActivity(${a.activityId},'已拒绝')">拒绝</button>`:''}<button class="btn btn-sm btn-outline-primary me-1" onclick="editActivity(${a.activityId})"><i class="bi bi-pencil"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteActivity(${a.activityId},'${escapeHtml(a.name)}')"><i class="bi bi-trash"></i></button></td></tr>`).join('');
+    document.getElementById('activityPagination').innerHTML=renderPagination(pr.total,pr.page,pr.pageSize,loadActivities);
+}
+
+async function reviewActivity(id,status){const d=await api.put(API_BASE+'/activity/review/'+id+'?status='+status);if(d.code===200){showToast(d.message);await Promise.all([loadStats(),loadActivities(activityPage)]);}else{showToast(d.message,'error');}}
+
+function openActivityAddModal(){document.getElementById('activityModalTitle').textContent='发布活动';document.getElementById('activityId').value='';document.getElementById('activityName').value='';document.getElementById('activityType').value='学术讲座';document.getElementById('activityOrganizer').value='';document.getElementById('activityVenueId').value='';document.getElementById('activityDate').value='';document.getElementById('activityStartTime').value='';document.getElementById('activityEndTime').value='';document.getElementById('activityMaxParticipants').value='100';document.getElementById('activityDescription').value='';activityModal.show();}
+async function editActivity(id){const data=await api.get(API_BASE+'/activity/'+id);if(data.code!==200)return;const a=data.data;document.getElementById('activityModalTitle').textContent='编辑活动';document.getElementById('activityId').value=a.activityId;document.getElementById('activityName').value=a.name;document.getElementById('activityType').value=a.type||'学术讲座';document.getElementById('activityOrganizer').value=a.organizer||'';document.getElementById('activityVenueId').value=a.venueId||'';document.getElementById('activityDate').value=a.activityDate||'';document.getElementById('activityStartTime').value=a.startTime||'';document.getElementById('activityEndTime').value=a.endTime||'';document.getElementById('activityMaxParticipants').value=a.maxParticipants||0;document.getElementById('activityDescription').value=a.description||'';activityModal.show();}
+async function saveActivity(){const id=document.getElementById('activityId').value;const activity={activityId:id?parseInt(id):null,name:document.getElementById('activityName').value.trim(),type:document.getElementById('activityType').value,organizer:document.getElementById('activityOrganizer').value.trim(),venueId:document.getElementById('activityVenueId').value||null,activityDate:document.getElementById('activityDate').value||null,startTime:document.getElementById('activityStartTime').value||null,endTime:document.getElementById('activityEndTime').value||null,maxParticipants:parseInt(document.getElementById('activityMaxParticipants').value)||0,description:document.getElementById('activityDescription').value.trim()};if(!activity.name){showToast('活动名称不能为空','error');return;}if(activity.venueId)activity.venueId=parseInt(activity.venueId);let d;if(id){d=await api.put(API_BASE+'/activity/update',activity);}else{delete activity.activityId;d=await api.post(API_BASE+'/activity/add',activity);}if(d.code===200){activityModal.hide();showToast(d.message);await loadActivities(activityPage);}else{showToast(d.message,'error');}}
+async function deleteActivity(id,name){if(!confirm('确定删除活动"'+name+'"吗？'))return;const d=await api.del(API_BASE+'/activity/'+id);if(d.code===200){showToast('删除成功');await loadActivities(activityPage);}else{showToast(d.message,'error');}}
+
+// ===== 活动日程 =====
+async function loadSchedule(){const date=document.getElementById('scheduleDate').value;const params=date?'?date='+date:'';const data=await api.get(API_BASE+'/activity/schedule'+params);const c=document.getElementById('scheduleContent');if(data.code!==200||!data.data.length){c.innerHTML='<div class="empty-state"><div class="icon">&#x1F4C5;</div><p>暂无日程安排</p></div>';return;}let html='';data.data.forEach(g=>{html+=`<div class="schedule-venue"><h6><i class="bi bi-geo-alt-fill"></i> ${escapeHtml(g.venueName)}</h6>`;g.activities.forEach(a=>{html+=`<div class="schedule-item"><div class="schedule-time">${a.startTime||''}-${a.endTime||''}</div><div class="schedule-info"><strong>${escapeHtml(a.name)}</strong><small class="text-muted ms-2">${escapeHtml(a.type||'')} | ${escapeHtml(a.organizer||'')}</small><small class="text-muted ms-2">&#x1F4C5;${a.activityDate||''} &#x1F4CD;${escapeHtml(a.venueLocation||'')}</small><small class="text-muted ms-2">&#x1F465;${a.currentParticipants||0}/${a.maxParticipants||0}</small></div></div>`;});html+='</div>';});c.innerHTML=html;}
+</script>
+</body>
+</html>
